@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Edit session{% endblock %}
+
+{% block content %}
+<div class="col-12 col-lg-6">
+  <h1 class="h3 mb-3">Edit session</h1>
+
+  <form method="POST" action="{{ url_for('edit_session', session_id=session.session_id) }}" novalidate>
+    <div class="mb-3">
+      <label for="day" class="form-label">Day</label>
+      <select class="form-select" id="day" name="day" required>
+        {% for d in days %}
+        <option value="{{ d }}" {% if session.day == d %}selected{% endif %}>{{ d }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="start_time" class="form-label">Start time</label>
+      <input type="time" class="form-control" id="start_time" name="start_time" required value="{{ session.start_time }}">
+      <div class="invalid-feedback">Please choose a start time.</div>
+    </div>
+
+    <div class="mb-3">
+      <label for="location" class="form-label">Location</label>
+      <select class="form-select" id="location" name="location" required>
+        {% for loc in locations %}
+        <option value="{{ loc }}" {% if session.location == loc %}selected{% endif %}>{{ loc }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-guild-primary">Save changes</button>
+    <a href="{{ url_for('gm_profile') }}" class="btn btn-outline-secondary">Cancel</a>
+  </form>
+</div>
+
+<script>
+  (function () {
+    const form = document.querySelector("form");
+    form.addEventListener("submit", function (event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add("was-validated");
+    });
+  })();
+</script>
+{% endblock %}

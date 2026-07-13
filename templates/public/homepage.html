@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Quests{% endblock %}
+{% block home_active %}active{% endblock %}
+
+{% block content %}
+<div class="col-12">
+  <h1 class="h3 mb-3">Here are all the quests!</h1>
+
+  <form method="GET" action="{{ url_for('homepage') }}" class="row g-2 align-items-end mb-4">
+    <div class="col-6 col-md-3">
+      <label for="filterDay" class="form-label">Day</label>
+      <select class="form-select" id="filterDay" name="day">
+        <option value="">Day</option>
+        {% for d in days %}
+        <option value="{{ d }}" {% if request.args.get('day') == d %}selected{% endif %}>{{ d }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <label for="filterType" class="form-label">Quest type</label>
+      <select class="form-select" id="filterType" name="quest_type">
+        <option value="">Type</option>
+        {% for t in quest_types %}
+        <option value="{{ t }}" {% if request.args.get('quest_type') == t %}selected{% endif %}>{{ t|capitalize }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <label for="filterDifficulty" class="form-label">Difficulty</label>
+      <select class="form-select" id="filterDifficulty" name="difficulty">
+        <option value="">Difficulty</option>
+        {% for diff in difficulties %}
+        <option value="{{ diff }}" {% if request.args.get('difficulty') == diff %}selected{% endif %}>{{ diff|capitalize }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-6 col-md-2">
+      <label for="filterRole" class="form-label">Open role</label>
+      <select class="form-select" id="filterRole" name="role">
+        <option value="">Role</option>
+        {% for r in roles %}
+        <option value="{{ r }}" {% if request.args.get('role') == r %}selected{% endif %}>{{ r }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-12 col-md-1 d-grid">
+      <button type="submit" class="btn btn-guild-primary">Filter</button>
+    </div>
+  </form>
+
+  {% if sessions|length == 0 %}
+  <p class="text-muted">No quest sessions match these filters.</p>
+  {% endif %}
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+    {% for s in sessions %}
+    <div class="col">
+      <article class="card quest-card h-100">
+        {% if s.image_path %}
+        <img src="{{ url_for('static', filename=s.image_path) }}" class="card-img-top" alt="Illustration for {{ s.title }}">
+        {% endif %}
+        <div class="card-body">
+          <h2 class="h5 card-title">
+            <a href="{{ url_for('quest', quest_id=s.quest_id) }}" class="text-decoration-none">{{ s.title }}</a>
+          </h2>
+          <p class="card-text mb-2">
+            <span class="badge badge-difficulty-{{ s.difficulty }}">{{ s.difficulty|capitalize }}</span> 
+            <span class="badge bg-secondary">{{ s.quest_type|capitalize }}</span>
+          </p>
+          <p class="card-text text-muted mb-1">
+            <i class="bi bi-calendar-event"></i> {{ s.day }}, <time>{{ s.start_time }}</time>
+          </p>
+          <p class="card-text text-muted">
+            <i class="bi bi-geo-alt"></i> {{ s.location }}
+          </p>
+          <a href="{{ url_for('session', session_id=s.session_id) }}" class="btn btn-outline-secondary btn-sm">View session</a>
+        </div>
+      </article>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

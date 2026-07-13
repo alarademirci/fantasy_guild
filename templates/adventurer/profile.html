@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}My quests{% endblock %}
+{% block profile_active %}active{% endblock %}
+
+{% block content %}
+<div class="col-12">
+  <h1 class="h3 mb-3">My quest participations</h1>
+
+  {% if participations|length == 0 %}
+  <p class="text-muted">You haven't joined any quest sessions yet. Visit the <a href="{{ url_for('homepage') }}">quest board</a> to find one.</p>
+  {% else %}
+  <table class="table align-middle">
+    <thead>
+      <tr>
+        <th scope="col">Quest</th>
+        <th scope="col">Day</th>
+        <th scope="col">Start time</th>
+        <th scope="col">Location</th>
+        <th scope="col">Role</th>
+        <th scope="col">Places</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in participations %}
+      <tr>
+        <td>{{ p.title }}</td>
+        <td>{{ p.day }}</td>
+        <td><time>{{ p.start_time }}</time></td>
+        <td>{{ p.location }}</td>
+        <td>{{ p.role_category }}</td>
+        <td>{{ p.places_reserved }}</td>
+        <td>
+          {% if p.modifiable %}
+          <form method="POST" action="{{ url_for('cancel_participation', participation_id=p.participation_id) }}">
+            <button type="submit" class="btn btn-outline-danger btn-sm">Cancel</button>
+          </form>
+          {% else %}
+          <span class="badge bg-secondary">Locked</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+{% endblock %}

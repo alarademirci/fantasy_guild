@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}New quest{% endblock %}
+{% block new_quest_active %}active{% endblock %}
+
+{% block content %}
+<div class="col-12 col-lg-6">
+  <h1 class="h3 mb-3">Create a new quest</h1>
+  <form method="POST" action="{{ url_for('new_quest') }}" enctype="multipart/form-data" novalidate>
+    <div class="mb-3">
+      <label for="title" class="form-label">Quest title</label>
+      <input type="text" class="form-control" id="title" name="title" required maxlength="100">
+      <div class="invalid-feedback">Please enter a title.</div>
+    </div>
+
+    <div class="mb-3">
+      <label for="duration_minutes" class="form-label">Duration (minutes)</label>
+      <input type="number" class="form-control" id="duration_minutes" name="duration_minutes" required min="1" step="1">
+      <div class="invalid-feedback">Duration must be a positive number of minutes.</div>
+    </div>
+
+    <div class="mb-3">
+      <label for="quest_type" class="form-label">Quest type</label>
+      <select class="form-select" id="quest_type" name="quest_type" required>
+        {% for t in quest_types %}
+        <option value="{{ t }}">{{ t|capitalize }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="difficulty" class="form-label">Difficulty</label>
+      <select class="form-select" id="difficulty" name="difficulty" required>
+        {% for d in difficulties %}
+        <option value="{{ d }}">{{ d|capitalize }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Short description</label>
+      <textarea class="form-control" id="description" name="description" rows="4" required maxlength="500"></textarea>
+      <div class="invalid-feedback">Please enter a description.</div>
+    </div>
+
+    <div class="mb-3">
+      <label for="quest_image" class="form-label">Promotional image</label>
+      <input type="file" class="form-control" id="quest_image" name="quest_image" accept="image/png, image/jpeg">
+    </div>
+
+    <button type="submit" class="btn btn-guild-primary">Create quest</button>
+  </form>
+</div>
+
+<script>
+  (function () {
+    const form = document.querySelector("form");
+    form.addEventListener("submit", function (event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add("was-validated");
+    });
+  })();
+</script>
+{% endblock %}

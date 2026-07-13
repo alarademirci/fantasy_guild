@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}{{ session.title }} – {{ session.day }}{% endblock %}
+
+{% block content %}
+<div class="col-12 col-lg-6">
+  <h1 class="h3 mb-1">{{ session.title }}</h1>
+  <p class="text-muted mb-3">
+    <i class="bi bi-calendar-event"></i> {{ session.day }}, {{ session.start_time }}
+    &middot; <i class="bi bi-geo-alt"></i> {{ session.location }}
+    &middot; <i class="bi bi-clock"></i> {{ session.duration_minutes }} min
+  </p>
+
+  <h2 class="h5">Available places</h2>
+  <ul class="list-group mb-4">
+    {% for role, spots in remaining.items() %}
+    <li class="list-group-item d-flex justify-content-between">
+      <span>{{ role }}</span>
+      <span class="badge bg-secondary">{{ spots }} left</span>
+    </li>
+    {% endfor %}
+  </ul>
+
+  {% if current_user.is_authenticated and current_user.is_adventurer() %}
+  <h2 class="h5">Join this session</h2>
+
+  <form method="POST" action="{{ url_for('join_session', session_id=session.session_id) }}">
+    <div class="mb-3">
+      <label for="role_category" class="form-label">Choose your role</label>
+      <select name="role_category" id="role_category" class="form-select" required>
+        <option value="" disabled selected>Select a role…</option>
+        {% for role in roles %}
+        <option value="{{ role }}">{{ role }} ({{ remaining[role] }} spots left)</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" name="bring_guest" id="bring_guest">
+      <label class="form-check-label" for="bring_guest">
+        Do you wish to bring a guest? (uses 2 spots)
+      </label>
+    </div>
+
+    <button type="submit" class="btn btn-guild-primary">Join session</button>
+  </form>
+  {% endif %}
+
+  <a href="{{ url_for('quest', quest_id=session.quest_id) }}" class="btn btn-link mt-3">← Back to quest</a>
+</div>
+{% endblock %}

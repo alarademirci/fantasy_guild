@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}{{ quest.title }}{% endblock %}
+
+{% block content %}
+<div class="col-12 col-lg-8">
+  <article>
+    {% if quest.image_path %}
+    <img src="{{ url_for('static', filename=quest.image_path) }}" class="img-fluid rounded mb-3" alt="Illustration for {{ quest.title }}">
+    {% endif %}
+
+    <h1 class="h3">{{ quest.title }}</h1>
+    <p>
+      <span class="badge badge-difficulty-{{ quest.difficulty }}">{{ quest.difficulty|capitalize }}</span>
+      <span class="badge bg-secondary">{{ quest.quest_type|capitalize }}</span>
+      <span class="badge bg-light text-dark border">{{ quest.dur_mins }} min</span>
+    </p>
+    <p>{{ quest.description }}</p>
+
+    {% if current_user.is_authenticated and current_user.is_guild_master() and current_user.id == quest.created_by %}
+    <a href="{{ url_for('new_session_form', quest_id=quest.quest_id) }}" class="btn btn-guild-primary mb-3">
+      <i class="bi bi-plus-lg"></i> Schedule a new session
+    </a>
+    {% endif %}
+
+    <h2 class="h5 mt-4">Scheduled sessions</h2>
+    {% if sessions|length == 0 %}
+    <p class="text-muted">No sessions have been scheduled for this quest yet.</p>
+    {% else %}
+    <ul class="list-group">
+      {% for s in sessions %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>
+          <i class="bi bi-calendar-event"></i> {{ s.day }}, <time>{{ s.start_time }}</time>
+          &middot; <i class="bi bi-geo-alt"></i> {{ s.location }}
+        </span>
+        <a href="{{ url_for('session', session_id=s.session_id) }}" class="btn btn-outline-secondary btn-sm">View</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </article>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Schedule a session{% endblock %}
+
+{% block content %}
+<div class="col-12 col-lg-6">
+  <h1 class="h3 mb-1">Schedule a session</h1>
+  <p class="text-muted mb-3">for <strong>{{ quest.title }}</strong> ({{ quest.dur_mins }} min)</p>
+
+  <form method="POST" action="{{ url_for('new_session', quest_id=quest.quest_id) }}" novalidate>
+    <div class="mb-3">
+      <label for="day" class="form-label">Day</label>
+      <select class="form-select" id="day" name="day" required>
+        {% for d in days %}
+        <option value="{{ d }}">{{ d }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="start_time" class="form-label">Start time</label>
+      <input type="time" class="form-control" id="start_time" name="start_time" required>
+      <div class="invalid-feedback">Please choose a start time.</div>
+    </div>
+
+    <div class="mb-3">
+      <label for="location" class="form-label">Location</label>
+      <select class="form-select" id="location" name="location" required>
+        {% for loc in locations %}
+        <option value="{{ loc }}">{{ loc }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-guild-primary">Schedule session</button>
+  </form>
+</div>
+
+<script>
+  (function () {
+    const form = document.querySelector("form");
+    form.addEventListener("submit", function (event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add("was-validated");
+    });
+  })();
+</script>
+{% endblock %}
