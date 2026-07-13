@@ -3,9 +3,6 @@ __pycache__/
 *.pyc
 *.pyo
 
-# Database
-database/myquest.db
-
 # macOS
 .DS_Store
 
