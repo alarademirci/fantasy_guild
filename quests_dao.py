@@ -1,5 +1,32 @@
 import sqlite3
 
+# Get all quests with optional filters
+def get_all_quests(quest_type=None, difficulty=None, day=None):
+    if day:
+        query = (
+            "SELECT DISTINCT Q.* FROM QUESTS Q "
+            "JOIN QUEST_SESSIONS QS ON Q.quest_id = QS.quest_id "
+            "WHERE (Q.quest_type = ? OR ? IS NULL) "
+            "AND (Q.difficulty = ? OR ? IS NULL) "
+            "AND QS.day = ? "
+            "ORDER BY Q.quest_id")
+        params = (quest_type, quest_type, difficulty, difficulty, day)
+    else:
+        query = (
+            "SELECT * FROM QUESTS "
+            "WHERE (quest_type = ? OR ? IS NULL) "
+            "AND (difficulty = ? OR ? IS NULL) "
+            "ORDER BY quest_id")
+        params = (quest_type, quest_type, difficulty, difficulty)
+    conn = sqlite3.connect("database/myquest.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute(query, params)
+    db_quests = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return db_quests
+
 # Get a specific quest
 def get_quest_by_id(quest_id):
     query = "SELECT * FROM QUESTS WHERE quest_id = ?"

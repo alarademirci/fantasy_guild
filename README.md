@@ -23,4 +23,4 @@ Here is the login information for the users I have created so far:
 
 - council@dragonlaria.com | admin123
 
-> **Note:** `SIMULATED_NOW` in `app.py` controls the fictional current date/time used for participation deadline checks.
+> **Note:** `SIMULATED_NOW` in `app.py` controls the fictional current date/time used for participation deadline checks. It is currently set to **Monday 17 August 2026, 09:00**. This can be changed to any date/time to test different scenarios.

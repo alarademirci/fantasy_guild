@@ -5,13 +5,13 @@
 
 {% block content %}
 <div class="col-12">
-  <h1 class="h3 mb-3">Here are all the quests!</h1>
+  <h1 class="h3 mb-3">Quest board</h1>
 
   <form method="GET" action="{{ url_for('homepage') }}" class="row g-2 align-items-end mb-4">
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-2">
       <label for="filterDay" class="form-label">Day</label>
       <select class="form-select" id="filterDay" name="day">
-        <option value="">Day</option>
+        <option value="">All days</option>
         {% for d in days %}
         <option value="{{ d }}" {% if request.args.get('day') == d %}selected{% endif %}>{{ d }}</option>
         {% endfor %}
@@ -21,17 +21,17 @@
     <div class="col-6 col-md-3">
       <label for="filterType" class="form-label">Quest type</label>
       <select class="form-select" id="filterType" name="quest_type">
-        <option value="">Type</option>
+        <option value="">All types</option>
         {% for t in quest_types %}
         <option value="{{ t }}" {% if request.args.get('quest_type') == t %}selected{% endif %}>{{ t|capitalize }}</option>
         {% endfor %}
       </select>
     </div>
 
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-2">
       <label for="filterDifficulty" class="form-label">Difficulty</label>
       <select class="form-select" id="filterDifficulty" name="difficulty">
-        <option value="">Difficulty</option>
+        <option value="">All</option>
         {% for diff in difficulties %}
         <option value="{{ diff }}" {% if request.args.get('difficulty') == diff %}selected{% endif %}>{{ diff|capitalize }}</option>
         {% endfor %}
@@ -39,45 +39,40 @@
     </div>
 
     <div class="col-6 col-md-2">
-      <label for="filterRole" class="form-label">Open role</label>
+      <label for="filterRole" class="form-label">Available role</label>
       <select class="form-select" id="filterRole" name="role">
-        <option value="">Role</option>
+        <option value="">Any role</option>
         {% for r in roles %}
         <option value="{{ r }}" {% if request.args.get('role') == r %}selected{% endif %}>{{ r }}</option>
         {% endfor %}
       </select>
     </div>
-    <div class="col-12 col-md-1 d-grid">
+
+    <div class="col-12 col-md-2 d-grid">
       <button type="submit" class="btn btn-guild-primary">Filter</button>
     </div>
   </form>
 
-  {% if sessions|length == 0 %}
-  <p class="text-muted">No quest sessions match these filters.</p>
+  {% if quests|length == 0 %}
+  <p class="text-muted">No quests match these filters.</p>
   {% endif %}
 
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
-    {% for s in sessions %}
+    {% for q in quests %}
     <div class="col">
       <article class="card quest-card h-100">
-        {% if s.image_path %}
-        <img src="{{ url_for('static', filename=s.image_path) }}" class="card-img-top" alt="Illustration for {{ s.title }}">
+        {% if q.image_path %}
+        <img src="{{ url_for('static', filename=q.image_path) }}" class="card-img-top" alt="Illustration for {{ q.title }}">
         {% endif %}
-        <div class="card-body">
-          <h2 class="h5 card-title">
-            <a href="{{ url_for('quest', quest_id=s.quest_id) }}" class="text-decoration-none">{{ s.title }}</a>
-          </h2>
+        <div class="card-body d-flex flex-column">
+          <h2 class="h5 card-title">{{ q.title }}</h2>
           <p class="card-text mb-2">
-            <span class="badge badge-difficulty-{{ s.difficulty }}">{{ s.difficulty|capitalize }}</span> 
-            <span class="badge bg-secondary">{{ s.quest_type|capitalize }}</span>
+            <span class="badge badge-difficulty-{{ q.difficulty }}">{{ q.difficulty|capitalize }}</span>
+            <span class="badge bg-secondary">{{ q.quest_type|capitalize }}</span>
+            <span class="badge bg-light text-dark border">{{ q.dur_mins }} min</span>
           </p>
-          <p class="card-text text-muted mb-1">
-            <i class="bi bi-calendar-event"></i> {{ s.day }}, <time>{{ s.start_time }}</time>
-          </p>
-          <p class="card-text text-muted">
-            <i class="bi bi-geo-alt"></i> {{ s.location }}
-          </p>
-          <a href="{{ url_for('session', session_id=s.session_id) }}" class="btn btn-outline-secondary btn-sm">View session</a>
+          <p class="card-text text-muted small flex-grow-1">{{ q.desc }}</p>
+          <a href="{{ url_for('quest', quest_id=q.quest_id) }}" class="btn btn-outline-secondary btn-sm mt-2">View session details</a>
         </div>
       </article>
     </div>

@@ -32,17 +32,35 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 # UNAUTHORIZED ROUTES (accessible to all) ─
-# THE HOMEPAGE: short version of the weekly quest program, with filters
+# THE HOMEPAGE: quest board with filters
 @app.route("/")
 def homepage():
-    selected_day = request.args.get("day") or None
     selected_quest_type = request.args.get("quest_type") or None
     selected_difficulty = request.args.get("difficulty") or None
+    selected_day = request.args.get("day") or None
     selected_role = request.args.get("role") or None
-    sessions_db = quest_sessions_dao.get_all_sessions(day=selected_day, quest_type=selected_quest_type,
-        difficulty=selected_difficulty, role=selected_role,)
-    return render_template("public/homepage.html", sessions=sessions_db, days=DAYS, quest_types=QUEST_TYPES,
-        difficulties=DIFFICULTIES, roles=list(ROLE_CAPACITIES.keys()))
+
+    quests_db = quests_dao.get_all_quests(quest_type=selected_quest_type, difficulty=selected_difficulty, day=selected_day)
+
+    if selected_role:
+        quests_with_role = [] #this is the list that is going to be returned
+
+        for q in quests_db:
+            sessions = quest_sessions_dao.get_sessions_by_quest(q["quest_id"]) #sessions list
+
+            for s in sessions:
+                # skip sessions that don't match the day filter
+                if selected_day and s["day"] != selected_day:
+                    continue
+
+                # if this session has space for the role, include the quest
+                if quest_sessions_dao.get_remaining_places(s["session_id"], selected_role) > 0:
+                    quests_with_role.append(q)
+                    break  # no need to check other sessions of this quest since we found one with space already here
+        quests_db = quests_with_role
+
+    return render_template("public/homepage.html", quests=quests_db, quest_types=QUEST_TYPES,
+        difficulties=DIFFICULTIES, days=DAYS, roles=list(ROLE_CAPACITIES.keys()))
 
 # THE CHOSEN QUEST PAGE : full details of the chosen quest and the available sessions
 @app.route("/quests/<int:quest_id>")
@@ -51,8 +69,8 @@ def quest(quest_id):
     if quest_db is None:
         flash("Quest not found", "danger")
         return redirect(url_for("homepage"))
-    sessions_with_remaining = quest_sessions_dao.get_sessions_with_remaining_places(quest_id)
-    return render_template("public/quest.html", quest=quest_db, sessions=sessions_with_remaining)
+    sessions = quest_sessions_dao.get_sessions_by_quest(quest_id)
+    return render_template("public/quest.html", quest=quest_db, sessions=sessions)
 
 # SESSION DETAIL PAGE: full details of the chosen session
 @app.route("/sessions/<int:session_id>")
