@@ -11,7 +11,6 @@ from flask_login import (
 from werkzeug.security import generate_password_hash, check_password_hash
 import users_dao, quests_dao, quest_sessions_dao, participations_dao, admin_dao
 from models import User
-
 from PIL import Image
 
 # CONSTANTS
@@ -98,6 +97,10 @@ def join_session(session_id):
 
     role_category = request.form.get("role_category")
     places_reserved = 2 if request.form.get("bring_guest") == "on" else 1
+
+    if role_category not in ROLE_CAPACITIES:
+        flash("Please select a valid role", "danger")
+        return redirect(url_for("session", session_id=session_id))
 
     ## control for if the adventurer has the right to enroll in another session
     if participations_dao.count_active_sessions_for_user(current_user.id) >= participations_dao.MAX_ACTIVE_SESSIONS:
