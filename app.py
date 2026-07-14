@@ -101,7 +101,12 @@ def register_post():
     password_hash = generate_password_hash(password, method="pbkdf2:sha256")
     users_dao.create_user(identifier, password_hash, "adventurer")
 
-    flash("Account created, you can now log in", "success")
+    new_user_db = users_dao.get_user_by_identifier(identifier)
+    new_user = User(id=new_user_db["user_id"], email=new_user_db["email"],
+                    password_hash=new_user_db["password_hash"], role=new_user_db["role"])
+    login_user(new_user, remember=True)
+
+    flash("Welcome to the guild, " + identifier + "!", "success")
     return redirect(url_for("homepage"))
 
 # AUTHORIZED ROUTES: ADVENTURER 
