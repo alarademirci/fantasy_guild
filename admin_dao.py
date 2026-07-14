@@ -1,6 +1,5 @@
 import sqlite3
 
-
 def get_adventurers_with_participation_count():
     query = (
         "SELECT U.user_id, U.email, COUNT(P.participation_id) AS participation_count "
@@ -21,42 +20,21 @@ def get_adventurers_with_participation_count():
 
 
 def get_all_quests_with_sessions():
-    query = (
-        "SELECT Q.quest_id, Q.title, Q.quest_type, Q.difficulty, Q.dur_mins AS duration_minutes, "
-        "QS.session_id, QS.day, QS.start_time, QS.location "
-        "FROM QUESTS Q "
-        "LEFT JOIN QUEST_SESSIONS QS ON Q.quest_id = QS.quest_id "
-        "ORDER BY Q.quest_id, QS.day, QS.start_time"
-    )
     conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute(query)
-    rows = cursor.fetchall()
+
+    quests = [dict(row) for row in cursor.execute(
+        "SELECT quest_id, title, quest_type, difficulty, dur_mins AS duration_minutes, image_path, created_by FROM QUESTS"
+    ).fetchall()]
+    for q in quests:
+        q["sessions"] = cursor.execute(
+            "SELECT * FROM QUEST_SESSIONS WHERE quest_id = ?", (q["quest_id"],)
+        ).fetchall()
+
     cursor.close()
     conn.close()
-
-    # Group sessions under each quest
-    quests = {}
-    for row in rows:
-        qid = row["quest_id"]
-        if qid not in quests:
-            quests[qid] = {
-                "quest_id": qid,
-                "title": row["title"],
-                "quest_type": row["quest_type"],
-                "difficulty": row["difficulty"],
-                "duration_minutes": row["duration_minutes"],
-                "sessions": [],
-            }
-        if row["session_id"] is not None:
-            quests[qid]["sessions"].append({
-                "session_id": row["session_id"],
-                "day": row["day"],
-                "start_time": row["start_time"],
-                "location": row["location"],
-            })
-    return list(quests.values())
+    return quests
 
 
 def get_statistics():

@@ -4,11 +4,16 @@
     --guild-parchment: #f4ede0;
     --guild-ink: #2b2320;
     --guild-forest: #3c5741;
+    --guild-gold: #e2b96e;
 }
 
 body {
     background-color: var(--guild-parchment);
     color: var(--guild-ink);
+}
+
+.text-muted {
+    color: #5a5248 !important;
 }
 
 #site-header h1 {
@@ -20,8 +25,10 @@ body {
 }
 
 .brand-title {
-    font-weight: 600;
-    letter-spacing: 0.03em;
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    font-size: 1.05rem;
 }
 
 .btn-guild-primary {
@@ -37,10 +44,52 @@ body {
     color: #fff;
 }
 
+/* Homepage hero */
+.guild-hero {
+    background: linear-gradient(160deg, #1c1310 0%, #2b1a10 45%, #3a2218 100%);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(181, 80, 47, 0.35);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    position: relative;
+    overflow: hidden;
+}
+
+.guild-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(181, 80, 47, 0.12) 0%, transparent 65%);
+    pointer-events: none;
+}
+
+.guild-hero-title {
+    font-family: 'Cinzel Decorative', serif;
+    color: var(--guild-gold);
+    font-size: clamp(1.4rem, 4.5vw, 2.8rem);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.02em;
+}
+
+.guild-hero-tagline {
+    color: #c8b49a;
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    font-style: italic;
+    margin-bottom: 1.75rem;
+    letter-spacing: 0.03em;
+}
+
+/* Quest cards */
 .quest-card {
     border: 1px solid rgba(43, 35, 32, 0.15);
     border-radius: 0.5rem;
     background-color: #fff;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.quest-card:hover {
+    box-shadow: 0 6px 20px rgba(43, 35, 32, 0.15);
+    transform: translateY(-2px);
 }
 
 .quest-card .card-img-top {
@@ -48,20 +97,24 @@ body {
     object-fit: cover;
 }
 
+/* Difficulty badges  */
 .badge-difficulty-easy {
     background-color: var(--guild-forest);
+    color: #fff;
 }
-
 .badge-difficulty-medium {
-    background-color: #a8842f;
+    background-color: #7a5e1f;
+    color: #fff;
 }
 
 .badge-difficulty-hard {
     background-color: var(--guild-ember-dark);
+    color: #fff;
 }
 
 .badge-difficulty-legendary {
     background-color: #5a2f7c;
+    color: #fff;
 }
 
 @media (max-width: 991.98px) {
@@ -72,4 +125,20 @@ body {
     .navbar-nav .nav-item {
         padding-bottom: 5px;
     }
+}
+
+/* ── Footer ────────────────────────────────────────────────────────────────── */
+.guild-footer {
+    background-color: var(--guild-ink);
+    color: #a89a8f;
+    border-top: 1px solid rgba(181, 80, 47, 0.25);
+}
+
+.footer-link {
+    color: #c8b49a;
+    text-decoration: none;
+}
+
+.footer-link:hover {
+    color: var(--guild-gold);
 }

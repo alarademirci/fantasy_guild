@@ -7,14 +7,15 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
   <header id="site-header">
     <nav class="navbar navbar-dark navbar-expand-lg guild-navbar">
       <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('homepage') }}">
-          <i class="bi bi-shield-shaded"></i>
           <span class="brand-title">Dragonlaria Magic Guild</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -88,6 +89,13 @@
     {% endwith %}
 
     <div class="row">
+      {% if request.endpoint != 'homepage' %}
+      <div class="col-12 mb-2">
+        <a href="{{ url_for('homepage') }}" class="btn btn-link ps-0 text-decoration-none">
+          <i class="bi bi-arrow-left"></i> Quest board
+        </a>
+      </div>
+      {% endif %}
       {% block content %}{% endblock %}
     </div>
   </div>
@@ -96,5 +104,10 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
     crossorigin="anonymous"></script>
+
+  <footer class="guild-footer mt-5 py-4 text-center">
+    <p class="mb-0">Dragonlaria Magic Guild. By Alara Demirci.</p>
+  </footer>
+
 </body>
 </html>

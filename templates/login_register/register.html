@@ -6,31 +6,23 @@
 {% block content %}
 <div class="col-12 col-md-6 col-lg-4 mx-auto">
   <h1 class="h3 mb-3">Join the guild</h1>
+
   <form method="POST" action="{{ url_for('register_post') }}" novalidate>
     <div class="mb-3">
       <label for="identifier" class="form-label">Email or username</label>
       <input type="text" class="form-control" id="identifier" name="identifier" required minlength="3" maxlength="50" placeholder="your@email.com">
       <div class="invalid-feedback">Please choose a username or email address.</div>
     </div>
+
     <div class="mb-3">
       <label for="password" class="form-label">Password</label>
       <input type="password" class="form-control" id="password" name="password" required minlength="8" placeholder="At least 8 characters">
       <div class="form-text">At least 8 characters.</div>
       <div class="invalid-feedback">Password must be at least 8 characters.</div>
     </div>
-    <div class="mb-3">
-      <label class="form-label">I want to join as</label>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="role" id="roleAdventurer" value="adventurer" required>
-        <label class="form-check-label" for="roleAdventurer">Adventurer</label>
-      </div>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="role" id="roleGuildMaster" value="guild_master">
-        <label class="form-check-label" for="roleGuildMaster">Guild Master</label>
-      </div>
-    </div>
     <button type="submit" class="btn btn-guild-primary w-100">Create account</button>
   </form>
+
 </div>
 
 <script>

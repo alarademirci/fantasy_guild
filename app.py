@@ -31,9 +31,11 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 # UNAUTHORIZED ROUTES (accessible to all) ─
-# THE HOMEPAGE: quest board with filters
+# THE HOMEPAGE: will only show quests that match the filters + have at least one available session
+
 @app.route("/")
-def homepage():
+def homepage(): 
+
     selected_quest_type = request.args.get("quest_type") or None
     selected_difficulty = request.args.get("difficulty") or None
     selected_day = request.args.get("day") or None
@@ -48,14 +50,11 @@ def homepage():
             sessions = quest_sessions_dao.get_sessions_by_quest(q["quest_id"]) #sessions list
 
             for s in sessions:
-                # skip sessions that don't match the day filter
                 if selected_day and s["day"] != selected_day:
                     continue
-
-                # if this session has space for the role, include the quest
                 if quest_sessions_dao.get_remaining_places(s["session_id"], selected_role) > 0:
                     quests_with_role.append(q)
-                    break  # no need to check other sessions of this quest since we found one with space already here
+                    break 
         quests_db = quests_with_role
 
     return render_template("public/homepage.html", quests=quests_db, quest_types=QUEST_TYPES,
@@ -81,18 +80,41 @@ def session(session_id):
     remaining = quest_sessions_dao.get_all_remaining_places(session_id)
     return render_template("public/session.html", session=session_db, remaining=remaining, roles=list(ROLE_CAPACITIES.keys()))
 
+# THE SIGNUP PAGE
+@app.route("/register")
+def register():
+    return render_template("login_register/register.html")
+
+@app.route("/register", methods=["POST"])
+def register_post():
+    identifier = request.form.get("identifier", "").strip()
+    password = request.form.get("password", "")
+
+    if identifier == "" or password == "":
+        flash("Email and password are required", "danger")
+        return redirect(url_for("register"))
+
+    if users_dao.identifier_exists(identifier):
+        flash("An account already exists", "danger")
+        return redirect(url_for("register"))
+
+    password_hash = generate_password_hash(password, method="pbkdf2:sha256")
+    users_dao.create_user(identifier, password_hash, "adventurer")
+
+    flash("Account created, you can now log in", "success")
+    return redirect(url_for("homepage"))
+
 # AUTHORIZED ROUTES: ADVENTURER 
-# JOIN A QUEST SESSION (POST REQUEST)
-@app.route("/sessions/<int:session_id>/join", methods=["GET", "POST"])
+# Redirects GET requests to the session page (Flask-Login sends a GET here after login)
+@app.route("/sessions/<int:session_id>/join", methods=["GET"])
+@login_required
+def join_session_get(session_id):
+    return redirect(url_for("session", session_id=session_id))
+
+# JOIN A QUEST SESSION
+@app.route("/sessions/<int:session_id>/join", methods=["POST"])
 @login_required
 def join_session(session_id):
-
-    if request.method == "GET":
-        return redirect(url_for("session", session_id=session_id))
-
-    if not current_user.is_adventurer():
-        flash("Only adventurers can join the quest sessions", "danger")
-        return redirect(url_for("homepage"))
     session_db = quest_sessions_dao.get_session_by_id(session_id)
     if session_db is None:
         flash("Quest session not found", "danger")
@@ -101,7 +123,7 @@ def join_session(session_id):
     role_category = request.form.get("role_category")
     places_reserved = 2 if request.form.get("bring_guest") == "on" else 1
 
-    if role_category not in ROLE_CAPACITIES:
+    if role_category not in ROLE_CAPACITIES: 
         flash("Please select a valid role", "danger")
         return redirect(url_for("session", session_id=session_id))
 
@@ -126,7 +148,7 @@ def join_session(session_id):
         app.logger.info("Participation created correctly")
         flash("You have joined the quest session!", "success")
     else:
-        app.logger.error("Error while creating your participation, pleasetry again!")
+        app.logger.error("Error while creating your participation, please try again!")
         flash("Something went wrong, please try again", "danger")
     return redirect(url_for("session", session_id=session_id))
 
@@ -134,10 +156,6 @@ def join_session(session_id):
 @app.route("/participations/<int:participation_id>/cancel", methods=["POST"])
 @login_required
 def cancel_participation(participation_id):
-    if not current_user.is_adventurer():
-        flash("Only adventurers have quest participations", "danger")
-        return redirect(url_for("homepage"))
-
     participations = participations_dao.get_participations_by_user(current_user.id)
     target = None
     for p in participations:
@@ -151,11 +169,11 @@ def cancel_participation(participation_id):
 
     if not participations_dao.is_modifiable(target["day"], target["start_time"], SIMULATED_NOW):
         app.logger.error("Participation can no longer be modified")
-        flash("This participation can no longer be modified (less than 8 hours before the session)", "danger")
+        flash("This participation can no longer be modified (there is less than 8 hours before the session)", "danger")
         return redirect(url_for("profile"))
 
     participations_dao.delete_participation(participation_id)
-    flash("Participation cancelled", "success")
+    flash("Participation cancelled successfully", "success")
     return redirect(url_for("profile"))
 
 # THE ADVENTURER'S OWN PROFILE PAGE
@@ -167,7 +185,7 @@ def profile():
     for p in participations_db:
         modifiable = participations_dao.is_modifiable(p["day"], p["start_time"], SIMULATED_NOW)
         participation = dict(p) # made a copy
-        participation["modifiable"] = modifiable #modifiable participations are added to the dict as a boolean
+        participation["modifiable"] = modifiable #modifiable participations are added (modifiable is a boolean)
         participations.append(participation)
     return render_template("adventurer/profile.html", participations=participations)
 
@@ -235,6 +253,7 @@ def new_session_form(quest_id):
     if not current_user.is_guild_master():
         flash("Only the Guild Master can schedule quest sessions", "danger")
         return redirect(url_for("homepage"))
+    
     quest_db = quests_dao.get_quest_by_id(quest_id)
     if quest_db is None:
         flash("Quest not found", "danger")
@@ -365,6 +384,7 @@ def gm_profile():
     for q in quests_db:
         sessions_db = quest_sessions_dao.get_sessions_by_quest(q["quest_id"])
         sessions_with_stats = []
+
         for s in sessions_db:
             remaining = quest_sessions_dao.get_all_remaining_places(s["session_id"])
             has_participants = quest_sessions_dao.has_participants(s["session_id"])
@@ -374,7 +394,7 @@ def gm_profile():
     return render_template("guildmaster/gm_profile.html", quests=quests_with_sessions)
 
 
-# AUTH ROUTES (register, login, logout)
+# AUTH ROUTES (login, logout)
 # GUILD COUNCIL ADMIN PAGE
 @app.route("/admin")
 @login_required
@@ -387,37 +407,12 @@ def admin():
     stats = admin_dao.get_statistics()
     return render_template("admin/admin.html", adventurers=adventurers, quests=quests, stats=stats)
 
-# THE SIGNUP PAGE 
-@app.route("/register")
-def register():
-    return render_template("auth/register.html")
-
-@app.route("/register", methods=["POST"])
-def register_post():
-    identifier = request.form.get("identifier", "").strip()
-    password = request.form.get("password", "")
-
-    if identifier == "" or password == "":
-        flash("Email and password are required", "danger")
-        return redirect(url_for("register"))
-
-    if users_dao.identifier_exists(identifier):
-        flash("An account already exists", "danger")
-        return redirect(url_for("register"))
-
-    password_hash = generate_password_hash(password, method="pbkdf2:sha256")
-    role = request.form.get("role")
-    users_dao.create_user(identifier, password_hash, role)
-
-    flash("Account created, you can now log in", "success")
-    return redirect(url_for("homepage"))
-
-# THE LOGIN PAGE ---------------------------------------------------------------
+# THE LOGIN PAGE
 @app.route("/login")
 def login():
-    return render_template("auth/login.html")
+    return render_template("login_register/login.html")
 
-# THE LOGIN FORM (POST REQUEST) -------------------------------------------------
+# THE LOGIN FORM (POST REQUEST) 
 @app.route("/login", methods=["POST"])
 def login_post():
     email = request.form.get("txt_email", "")
@@ -444,7 +439,7 @@ def load_user(user_id):
     return User(id=db_user["user_id"], email=db_user["email"],
                 password_hash=db_user["password_hash"], role=db_user["role"])
 
-# THE LOGOUT -----------------------------------------------------------------------
+# THE LOGOUT 
 @app.route("/logout")
 @login_required
 def logout():

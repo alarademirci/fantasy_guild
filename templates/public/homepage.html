@@ -4,6 +4,17 @@
 {% block home_active %}active{% endblock %}
 
 {% block content %}
+<div class="col-12 mb-4">
+  <div class="guild-hero text-center py-5 px-3">
+    <p class="guild-hero-title">Dragonlaria Magic Guild</p>
+    <p class="guild-hero-tagline">Choose the quest your heart desires!</p>
+    {% if not current_user.is_authenticated %}
+    <a href="{{ url_for('register') }}" class="btn btn-guild-primary btn-lg me-2">Join the guild</a>
+    <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">Log in</a>
+    {% endif %}
+  </div>
+</div>
+
 <div class="col-12">
   <h1 class="h3 mb-3">Quest board</h1>
 
@@ -78,5 +89,6 @@
     </div>
     {% endfor %}
   </div>
+</div>
 </div>
 {% endblock %}
