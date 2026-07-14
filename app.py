@@ -83,9 +83,12 @@ def session(session_id):
 
 # AUTHORIZED ROUTES: ADVENTURER 
 # JOIN A QUEST SESSION (POST REQUEST)
-@app.route("/sessions/<int:session_id>/join", methods=["POST"])
+@app.route("/sessions/<int:session_id>/join", methods=["GET", "POST"])
 @login_required
 def join_session(session_id):
+
+    if request.method == "GET":
+        return redirect(url_for("session", session_id=session_id))
 
     if not current_user.is_adventurer():
         flash("Only adventurers can join the quest sessions", "danger")

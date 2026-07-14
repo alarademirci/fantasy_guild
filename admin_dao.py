@@ -10,7 +10,7 @@ def get_adventurers_with_participation_count():
         "GROUP BY U.user_id "
         "ORDER BY U.email"
     )
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(query)
@@ -28,7 +28,7 @@ def get_all_quests_with_sessions():
         "LEFT JOIN QUEST_SESSIONS QS ON Q.quest_id = QS.quest_id "
         "ORDER BY Q.quest_id, QS.day, QS.start_time"
     )
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(query)
@@ -60,7 +60,7 @@ def get_all_quests_with_sessions():
 
 
 def get_statistics():
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 

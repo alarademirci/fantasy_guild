@@ -15,7 +15,7 @@ def get_participations_by_user(user_id):
         "JOIN QUESTS Q ON QS.quest_id = Q.quest_id "
         "WHERE P.user_id = ?"
     )
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(query, (user_id,))
@@ -27,7 +27,7 @@ def get_participations_by_user(user_id):
 
 def count_active_sessions_for_user(user_id):
     query = "SELECT COUNT(*) AS n FROM PARTICIPATIONS WHERE user_id = ?"
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(query, (user_id,))
@@ -45,7 +45,7 @@ def get_user_session_schedules(user_id):
         "JOIN QUESTS Q ON QS.quest_id = Q.quest_id "
         "WHERE P.user_id = ?"
     )
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(query, (user_id,))
@@ -71,7 +71,7 @@ def has_time_conflict(user_id, day, start_time, duration_minutes):
 
 def create_participation(user_id, session_id, role_category, places_reserved):
     query = "INSERT INTO PARTICIPATIONS (user_id, session_id, role_is, places_reserved) VALUES (?, ?, ?, ?)"
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(query, (user_id, session_id, role_category, places_reserved))
@@ -97,7 +97,7 @@ def is_modifiable(session_day, session_start_time, simulated_now):
 
 def delete_participation(participation_id):
     query = "DELETE FROM PARTICIPATIONS WHERE participation_id = ?"
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(query, (participation_id,))

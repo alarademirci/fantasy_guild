@@ -16,7 +16,7 @@ def get_remaining_places(session_id, role_category):
         "SELECT COALESCE(SUM(places_reserved), 0) AS taken " #COALESCE is added bc if no participants = return 0 rather than NULL
         "FROM PARTICIPATIONS P "
         "WHERE session_id = ? AND role_is = ?" )
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(query, (session_id, role_category))
@@ -59,7 +59,7 @@ def get_all_sessions(day=None, quest_type=None, difficulty=None, role=None):
         "AND (Q.quest_type = ? OR ? IS NULL) "
         "AND (Q.difficulty = ? OR ? IS NULL)")
 
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
@@ -89,7 +89,7 @@ def get_session_by_id(session_id):
         "FROM QUEST_SESSIONS QS "
         "JOIN QUESTS Q ON QS.quest_id = Q.quest_id "
         "WHERE QS.session_id = ?" )
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(query, (session_id,))
@@ -101,7 +101,7 @@ def get_session_by_id(session_id):
 #Gets all the sessions for a specific quest
 def get_sessions_by_quest(quest_id):
     query = "SELECT * FROM QUEST_SESSIONS WHERE quest_id = ?"
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(query, (quest_id,))
@@ -118,7 +118,7 @@ def get_sessions_by_creator(user_id):
         "JOIN QUESTS Q ON QS.quest_id = Q.quest_id "
         "WHERE Q.created_by = ? "
         "ORDER BY Q.quest_id" )
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(query, (user_id,))
@@ -135,7 +135,7 @@ def is_overlapping(day, location, start_time, duration_minutes, exclude_session_
         "JOIN QUESTS Q ON QS.quest_id = Q.quest_id "
         "WHERE QS.day = ? AND QS.location = ? "
         "AND (QS.session_id != ? OR ? IS NULL)" )
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(query, (day, location, exclude_session_id, exclude_session_id))
@@ -157,7 +157,7 @@ def is_overlapping(day, location, start_time, duration_minutes, exclude_session_
 # Checks if a session has participants
 def has_participants(session_id):
     query = "SELECT 1 FROM PARTICIPATIONS WHERE session_id = ? LIMIT 1"
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(query, (session_id,))
@@ -169,7 +169,7 @@ def has_participants(session_id):
 #Creates a new session
 def create_session(quest_id, day, start_time, location):
     query = "INSERT INTO QUEST_SESSIONS (quest_id, day, start_time, location) VALUES (?, ?, ?, ?)"
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(query, (quest_id, day, start_time, location))
@@ -182,7 +182,7 @@ def create_session(quest_id, day, start_time, location):
 # Updates a session
 def update_session(session_id, day, start_time, location):
     query = "UPDATE QUEST_SESSIONS SET day = ?, start_time = ?, location = ? WHERE session_id = ?"
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(query, (day, start_time, location, session_id))
@@ -193,7 +193,7 @@ def update_session(session_id, day, start_time, location):
 # Deletes a session
 def delete_session(session_id):
     query = "DELETE FROM QUEST_SESSIONS WHERE session_id = ?"
-    conn = sqlite3.connect("database/myquest.db")
+    conn = sqlite3.connect("database/dragonlaria.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(query, (session_id,))
